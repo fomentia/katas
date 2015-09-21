@@ -1,0 +1,4 @@
+Bruce Wayne bruce@wayne.net
+Luke Skywalker luke@thejedi.org
+Leia Skywalker leia@therebellion.net
+James Kirk james@theenterprise.com
