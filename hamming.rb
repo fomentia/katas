@@ -9,7 +9,7 @@ class Hamming
     raise ArgumentError if strand_one.length != strand_two.length
 
     differences = []
-    strand_one.chars.each_with_index do |nt, index|
+    strand_one.chars.each.with_index do |nt, index|
       differences << strand_two[index] unless strand_two[index] == nt
     end
 
