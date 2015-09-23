@@ -130,4 +130,10 @@ class SecretSanta
 
     people
   end
+
+  def pretty(people)
+    people.each do |person|
+      puts "#{person[:first_name]} #{person[:last_name]} got #{person[:secret_santa][:first_name]} #{person[:secret_santa][:last_name]}"
+    end
+  end
 end
