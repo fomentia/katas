@@ -3,71 +3,89 @@
 #include <algorithm>
 using namespace std;
 
-struct charNode {
-  char currentChar;
-  int currentIndex;
-  charNode * nextChar;
-};
-typedef charNode * stringArray;
+class IWString {
+  struct charNode {
+    char currentChar;
+    int currentIndex;
+    charNode * nextChar;
+  };
+  typedef charNode * stringArray;
 
-stringArray stringArrayInitializer(string str) {
-  vector<char> v(str.begin(), str.end());
-  stringArray sa;
-  sa = NULL;
-  for(int ch = 0; ch < str.size(); ch++) {
-    charNode * node = new charNode;
-    node->currentChar = v[ch];
-    node->currentIndex = ch;
-    node->nextChar = sa;
-    sa = node;
+  stringArray self;
+
+  static stringArray stringLinker(string str) {
+    vector<char> v(str.begin(), str.end());
+    stringArray sa;
+    sa = NULL;
+    for(int ch = 0; ch < str.size(); ch++) {
+      charNode * node = new charNode;
+      node->currentChar = v[ch];
+      node->currentIndex = ch;
+      node->nextChar = sa;
+      sa = node;
+    }
+    return sa;
   }
 
-  return sa;
-}
+  string toString(stringArray sa) {
+    string str;
+    charNode * loop = self;
+    while(loop != NULL) {
+      str += loop->currentChar;
+      loop = loop->nextChar;
+    }
+    reverse(str.begin(), str.end());
+    return str;
+  }
 
-void replace(string source, string target, string replaceText) {
-  reverse(source.begin(), source.end());
-  reverse(target.begin(), target.end());
-  reverse(replaceText.begin(), replaceText.end());
-  stringArray sourceArray = stringArrayInitializer(source);
-  stringArray targetArray = stringArrayInitializer(target);
+public:
+  IWString() { self = NULL; }
+  IWString(string initialString) {
+    self = stringLinker(initialString);
+  }
 
-  charNode * loop = sourceArray;
-  charNode * targetloop = targetArray;
-  vector<vector<int> > result;
-  vector<int> cache;
-  while(loop != NULL) {
-    if(targetloop != NULL) {
-      if(loop->currentChar == targetloop->currentChar) {
-        cache.push_back(loop->currentIndex);
-        targetloop = targetloop->nextChar;
-      } else {
+  string replace(string target, string replaceText) {
+    string source = toString(self);
+    stringArray targetArray = stringLinker(target);
+
+    charNode * loop = self;
+    charNode * targetloop = targetArray;
+    vector<vector<int> > result;
+    vector<int> cache;
+    while(loop != NULL) {
+      if(targetloop != NULL) {
+        if(loop->currentChar == targetloop->currentChar) {
+          cache.push_back(loop->currentIndex);
+          targetloop = targetloop->nextChar;
+        } else {
+          targetloop = targetArray; cache.clear();
+        }
+      }
+      if(targetloop == NULL) {
+        result.push_back(cache);
         targetloop = targetArray; cache.clear();
       }
+      loop = loop->nextChar;
     }
-    if(targetloop == NULL) {
-      result.push_back(cache);
-      targetloop = targetArray; cache.clear();
+
+    for(int i = 0; i < result.size(); ++i) {
+      source.replace(result[i].back(), result[i].size(), replaceText);
     }
-    loop = loop->nextChar;
+
+    return source;
   }
 
-  for(int i = 0; i < result.size(); ++i) {
-    source.replace(result[i].back(), result[i].size(), replaceText);
+  string remove(const int& start, const int& count) {
+    // Manual implementation of std::string::erase
+    string wholestr = toString(self);
+    string alteredstr;
+    vector<int> toRemove;
+    for(int i = start; i < start + count; ++i) { toRemove.push_back(i); }
+    for(int i = 0; i < wholestr.length(); ++i) {
+      if(std::find(toRemove.begin(), toRemove.end(), i) == toRemove.end()) {
+        alteredstr += wholestr[i];
+      }
+    }
+    return alteredstr;
   }
-
-  reverse(source.begin(), source.end());
-  cout << source << endl;
-}
-
-int main () {
-  string source; string target; string replacement;
-  cout << "Please enter your string: ";
-  getline(cin, source);
-  cout << "Please enter your target: ";
-  getline(cin, target);
-  cout << "Please enter your replacement text: ";
-  getline(cin, replacement);
-
-  replace(source, target, replacement);
-}
+};
